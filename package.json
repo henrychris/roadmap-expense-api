@@ -17,7 +17,12 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "typeorm": "typeorm-ts-node-commonjs",
+    "migration:generate": "typeorm-ts-node-commonjs migration:generate ./src/data/migrations/schema-update -d ./src/data/dataSource.ts -p",
+    "migration:run": "typeorm-ts-node-commonjs migration:run -d  ./src/data/dataSource.ts",
+    "migration:revert": "typeorm-ts-node-commonjs migration:revert -d ./src/data/dataSource.ts",
+    "schema:sync": "typeorm-ts-node-commonjs schema:sync -d ./src/data/dataSource.ts"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
@@ -25,11 +30,14 @@
     "@nestjs/core": "^10.0.0",
     "@nestjs/mapped-types": "*",
     "@nestjs/platform-express": "^10.0.0",
+    "@nestjs/typeorm": "^10.0.2",
     "@types/morgan": "^1.9.9",
     "joi": "^17.13.3",
     "morgan": "^1.10.0",
+    "pg": "^8.13.0",
     "reflect-metadata": "^0.2.0",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "typeorm": "^0.3.20"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",
@@ -50,7 +58,7 @@
     "supertest": "^7.0.0",
     "ts-jest": "^29.1.0",
     "ts-loader": "^9.4.3",
-    "ts-node": "^10.9.1",
+    "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.1.3"
   },
