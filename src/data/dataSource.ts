@@ -13,6 +13,6 @@ export default new DataSource({
   dropSchema: false,
   logging: false,
   logger: 'simple-console',
-  entities: ['src/**/*.entity{.ts,.js}'],
+  entities: ['src/features/**/*.entity{.ts,.js}'],
   migrations: ['src/data/migrations/**/*{.ts,.js}'], // if this doesn't work, change src to dist
 });
