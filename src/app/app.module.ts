@@ -46,10 +46,6 @@ import DatabaseConfig from 'src/config/databaseConfig';
       }),
       inject: [ConfigService],
     }),
-    // next: create db entities, create migration, use test endpoint to create a test user, note down what i did.
-    // installed packages
-    // added new config
-    // added typeOrm module
   ],
   controllers: [AppController],
   providers: [AppService],
