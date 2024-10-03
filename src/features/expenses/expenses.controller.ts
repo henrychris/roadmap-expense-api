@@ -8,18 +8,26 @@ import {
   Delete,
   HttpCode,
   HttpStatus,
+  UseGuards,
 } from '@nestjs/common';
 import { ExpensesService } from './expenses.service';
 import { CreateExpenseDto } from './dto/create-expense.dto';
 import { UpdateExpenseDto } from './dto/update-expense.dto';
+import { AuthGuard } from '../auth/guards/authGuard';
+import { CurrentUser } from '../../common/decorators/currentUser';
+import { JwtPayload } from '../auth/dto/jwtPayload';
 
 @Controller('expenses')
 export class ExpensesController {
   constructor(private readonly expensesService: ExpensesService) {}
 
+  @UseGuards(AuthGuard)
   @Post()
-  create(@Body() createExpenseDto: CreateExpenseDto) {
-    return this.expensesService.create(createExpenseDto);
+  async createAsync(
+    @Body() createExpenseDto: CreateExpenseDto,
+    @CurrentUser() user: JwtPayload,
+  ) {
+    return await this.expensesService.createAsync(createExpenseDto, user);
   }
 
   @Get()
