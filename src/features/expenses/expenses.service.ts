@@ -9,6 +9,9 @@ import { User } from '../users/entities/user.entity';
 import { JwtPayload } from '../auth/dto/jwtPayload';
 import { mapExpenseToGetExpenseResponse } from './expense.mapper';
 import { GetExpenseDto } from './dto/get-expense.dto';
+import { ExpenseFilterDto } from './dto/expense.filter.dto';
+import { Between, MoreThanOrEqual, LessThanOrEqual } from 'typeorm';
+import { subDays, subMonths, startOfDay } from 'date-fns';
 
 @Injectable()
 export class ExpensesService {
@@ -55,20 +58,66 @@ export class ExpensesService {
     return mapExpenseToGetExpenseResponse(res);
   }
 
-  async findAll(jwtUser: JwtPayload) {
-    const res = await this.expenseRepository.find({
+  async findAll(jwtUser: JwtPayload, filterDto: ExpenseFilterDto) {
+    const { filter, startDate, endDate, limit = 10, page = 0 } = filterDto;
+    let dateFilter = this.getDateFilter(filter, startDate, endDate);
+    console.log(`date filter: ${dateFilter}`);
+    console.log(JSON.stringify(dateFilter));
+    
+
+    const [expenses, total] = await this.expenseRepository.findAndCount({
       relations: {
         category: true,
         user: true,
       },
       where: {
-        user: {
-          id: jwtUser.sub,
-        },
+        user: { id: jwtUser.sub },
+        ...dateFilter,
       },
+      skip: page * limit,
+      take: limit,
     });
 
-    return res.map((x) => mapExpenseToGetExpenseResponse(x));
+    return {
+      data: expenses.map((x) => mapExpenseToGetExpenseResponse(x)),
+      total,
+      limit,
+      page,
+    };
+  }
+
+  private getDateFilter(
+    filter: string | undefined,
+    startDate: string | undefined,
+    endDate: string | undefined,
+  ): {} {
+    let dateFilter = {};
+    const today = new Date();
+
+    if (filter === 'week') {
+      const oneWeekAgo = subDays(today, 7);
+      dateFilter = { dateCreated: Between(oneWeekAgo, today) };
+    } else if (filter === 'month') {
+      const oneMonthAgo = subMonths(today, 1);
+      dateFilter = { dateCreated: Between(oneMonthAgo, today) };
+    } else if (filter === '3months') {
+      const threeMonthsAgo = subMonths(today, 3);
+      dateFilter = { dateCreated: Between(threeMonthsAgo, today) };
+    }
+
+    if (startDate && endDate) {
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      dateFilter = { dateCreated: Between(start, end) };
+    } else if (startDate) {
+      const start = new Date(startDate);
+      dateFilter = { dateCreated: MoreThanOrEqual(start) };
+    } else if (endDate) {
+      const end = new Date(endDate);
+      dateFilter = { dateCreated: LessThanOrEqual(end) };
+    }
+
+    return dateFilter;
   }
 
   async findOneAsync(expenseId: string, jwtUser: JwtPayload) {

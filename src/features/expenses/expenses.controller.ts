@@ -9,6 +9,7 @@ import {
   HttpCode,
   HttpStatus,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { ExpensesService } from './expenses.service';
 import { CreateExpenseDto } from './dto/create-expense.dto';
@@ -16,6 +17,7 @@ import { UpdateExpenseDto } from './dto/update-expense.dto';
 import { AuthGuard } from '../auth/guards/authGuard';
 import { CurrentUser } from '../../common/decorators/currentUser';
 import { JwtPayload } from '../auth/dto/jwtPayload';
+import { ExpenseFilterDto } from './dto/expense.filter.dto';
 
 @UseGuards(AuthGuard)
 @Controller('expenses')
@@ -31,8 +33,11 @@ export class ExpensesController {
   }
 
   @Get()
-  findAll(@CurrentUser() jwtUser: JwtPayload) {
-    return this.expensesService.findAll(jwtUser);
+  findAll(
+    @CurrentUser() jwtUser: JwtPayload,
+    @Query() filterDto: ExpenseFilterDto,
+  ) {
+    return this.expensesService.findAll(jwtUser, filterDto);
   }
 
   @Get(':id')
