@@ -1,5 +1,5 @@
-import { BaseEntity } from 'src/common/entities/base.entity';
-import { User } from 'src/features/users/entities/user.entity';
+import { BaseEntity } from '../../../common/entities/base.entity';
+import { User } from '../../users/entities/user.entity';
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
 
 @Entity({ name: 'Expenses' })
@@ -16,9 +16,6 @@ export class Expense extends BaseEntity {
   @Column()
   passwordHash: string;
 
-  @ManyToOne(() => User, (user) => user.expenses)
+  @ManyToOne(() => User, (user) => user.expenses, { nullable: false })
   user: User;
-
-  // todo: add category resource
-  // todo: add one-to-one between expense and category
 }

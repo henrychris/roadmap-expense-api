@@ -1,5 +1,5 @@
-import { BaseEntity } from 'src/common/entities/base.entity';
-import { Expense } from 'src/features/expenses/entities/expense.entity';
+import { BaseEntity } from '../../../common/entities/base.entity';
+import { Expense } from '../../expenses/entities/expense.entity';
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 
 @Entity({ name: 'Users' })
