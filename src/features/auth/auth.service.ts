@@ -4,6 +4,7 @@ import { LoginRequest } from './dto/login-request-dto';
 import { UsersService } from '../users/users.service';
 import { SignupRequest } from './dto/signup-request-dto';
 import { JwtService } from '@nestjs/jwt';
+import { JwtPayload } from './dto/jwtPayload';
 
 @Injectable()
 export class AuthService {
@@ -29,10 +30,11 @@ export class AuthService {
       passwordHash: hashedPassword,
     });
 
+    var payload = new JwtPayload(newUser.id);
     return {
-      access_token: await this.jwtService.signAsync({
-        sub: newUser.id,
-      }),
+      access_token: await this.jwtService.signAsync(
+        JSON.parse(JSON.stringify(payload)),
+      ),
     };
   }
 
@@ -52,10 +54,11 @@ export class AuthService {
       throw new UnauthorizedException('email or password incorrect.');
     }
 
+    var payload = new JwtPayload(user.id);
     return {
-      access_token: await this.jwtService.signAsync({
-        sub: user.id,
-      }),
+      access_token: await this.jwtService.signAsync(
+        JSON.parse(JSON.stringify(payload)),
+      ),
     };
   }
 }
