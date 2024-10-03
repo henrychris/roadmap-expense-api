@@ -3,6 +3,7 @@ import { AppModule } from './app/app.module';
 import * as logger from 'morgan';
 import { ConfigService } from '@nestjs/config';
 import { HttpStatus, ValidationPipe } from '@nestjs/common';
+import { SeederService } from './features/seed/seeder.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -12,6 +13,9 @@ async function bootstrap() {
       errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
     }),
   );
+
+  const seederService = app.get(SeederService);
+  await seederService.seedCategories();
 
   const configService = app.get(ConfigService);
   const PORT: number = configService.getOrThrow('PORT');

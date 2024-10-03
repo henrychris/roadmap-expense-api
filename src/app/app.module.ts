@@ -8,11 +8,13 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import * as Joi from 'joi';
 import DatabaseConfig from 'src/config/databaseConfig';
 import { AuthModule } from 'src/features/auth/auth.module';
+import { SeedModule } from 'src/features/seed/seed.module';
 
 @Module({
   imports: [
     UsersModule,
     ExpensesModule,
+    SeedModule,
     AuthModule,
     ConfigModule.forRoot({
       isGlobal: true,
