@@ -17,38 +17,42 @@ import { AuthGuard } from '../auth/guards/authGuard';
 import { CurrentUser } from '../../common/decorators/currentUser';
 import { JwtPayload } from '../auth/dto/jwtPayload';
 
+@UseGuards(AuthGuard)
 @Controller('expenses')
 export class ExpensesController {
   constructor(private readonly expensesService: ExpensesService) {}
 
-  @UseGuards(AuthGuard)
   @Post()
   async createAsync(
     @Body() createExpenseDto: CreateExpenseDto,
-    @CurrentUser() user: JwtPayload,
+    @CurrentUser() jwtUser: JwtPayload,
   ) {
-    return await this.expensesService.createAsync(createExpenseDto, user);
+    return await this.expensesService.createAsync(createExpenseDto, jwtUser);
   }
 
   @Get()
-  findAll() {
-    return this.expensesService.findAll();
+  findAll(@CurrentUser() jwtUser: JwtPayload) {
+    return this.expensesService.findAll(jwtUser);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.expensesService.findOne(id);
+  async findOne(@Param('id') id: string, @CurrentUser() jwtUser: JwtPayload) {
+    return await this.expensesService.findOneAsync(id, jwtUser);
   }
 
   @Patch(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  update(@Param('id') id: string, @Body() updateExpenseDto: UpdateExpenseDto) {
-    return this.expensesService.update(id, updateExpenseDto);
+  update(
+    @Param('id') id: string,
+    @Body() updateExpenseDto: UpdateExpenseDto,
+    @CurrentUser() jwtUser: JwtPayload,
+  ) {
+    return this.expensesService.updateAsync(id, updateExpenseDto, jwtUser);
   }
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id') id: string) {
-    return this.expensesService.remove(id);
+  async remove(@Param('id') id: string, @CurrentUser() jwtUser: JwtPayload) {
+    return await this.expensesService.removeAsync(id, jwtUser);
   }
 }

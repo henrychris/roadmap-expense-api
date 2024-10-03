@@ -51,23 +51,106 @@ export class ExpensesService {
       user,
     });
 
-    let res = await this.expenseRepository.save(expense);
+    const res = await this.expenseRepository.save(expense);
     return mapExpenseToGetExpenseResponse(res);
   }
 
-  findAll() {
-    return `This action returns all expenses`;
+  async findAll(jwtUser: JwtPayload) {
+    const res = await this.expenseRepository.find({
+      relations: {
+        category: true,
+        user: true,
+      },
+      where: {
+        user: {
+          id: jwtUser.sub,
+        },
+      },
+    });
+
+    return res.map((x) => mapExpenseToGetExpenseResponse(x));
   }
 
-  findOne(id: string) {
-    return `This action returns a #${id} expense`;
+  async findOneAsync(expenseId: string, jwtUser: JwtPayload) {
+    const expense = await this.expenseRepository.findOne({
+      where: {
+        id: expenseId,
+        user: {
+          id: jwtUser.sub,
+        },
+      },
+      relations: {
+        category: true,
+        user: true,
+      },
+    });
+
+    if (!expense) {
+      console.error(
+        `Expense not found with id: ${expenseId}, user id: ${jwtUser.sub}`,
+      );
+      throw new NotFoundException('Expense not found');
+    }
+
+    return mapExpenseToGetExpenseResponse(expense);
   }
 
-  update(id: string, updateExpenseDto: UpdateExpenseDto) {
-    return `This action updates a #${id} expense`;
+  async updateAsync(
+    expenseId: string,
+    updateExpenseDto: UpdateExpenseDto,
+    jwtUser: JwtPayload,
+  ): Promise<void> {
+    const expense = await this.expenseRepository.findOne({
+      where: { id: expenseId, user: { id: jwtUser.sub } },
+      relations: {
+        category: true,
+      },
+    });
+
+    if (!expense) {
+      console.error(
+        `Expense not found with id: ${expenseId}, user id: ${jwtUser.sub}`,
+      );
+      throw new NotFoundException('Expense not found');
+    }
+
+    if (
+      updateExpenseDto.categoryId &&
+      expense.category.id !== updateExpenseDto.categoryId
+    ) {
+      const category = await this.categoryRepository.findOneBy({
+        id: updateExpenseDto.categoryId,
+      });
+
+      if (!category) {
+        console.error(
+          `Category not found with id: ${updateExpenseDto.categoryId}.`,
+        );
+        throw new NotFoundException('Category not found');
+      }
+
+      expense.category = category;
+    }
+
+    Object.assign(expense, updateExpenseDto);
+
+    // Save the updated expense
+    await this.expenseRepository.save(expense);
   }
 
-  remove(id: string) {
-    return `This action removes a #${id} expense`;
+  async removeAsync(expenseId: string, jwtUser: JwtPayload): Promise<void> {
+    const deleteResult = await this.expenseRepository.delete({
+      id: expenseId,
+      user: {
+        id: jwtUser.sub,
+      },
+    });
+
+    if (deleteResult.affected && deleteResult.affected === 0) {
+      console.error(
+        `Expense not found with id: ${expenseId}, user id: ${jwtUser.sub}`,
+      );
+      throw new NotFoundException('Expense not found');
+    }
   }
 }
