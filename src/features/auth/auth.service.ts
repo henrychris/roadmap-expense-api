@@ -14,7 +14,7 @@ export class AuthService {
   ) {}
 
   async signupAsync(signupRequest: SignupRequest) {
-    var user = await this.usersService.findByEmailAsync(signupRequest.email);
+    const user = await this.usersService.findByEmailAsync(signupRequest.email);
     if (user) {
       console.warn('This email is already in use.');
       throw new UnauthorizedException(
@@ -22,15 +22,15 @@ export class AuthService {
       );
     }
 
-    var hashedPassword = await hash(signupRequest.password, 10);
-    var newUser = await this.usersService.createAsync({
+    const hashedPassword = await hash(signupRequest.password, 10);
+    const newUser = await this.usersService.createAsync({
       firstName: signupRequest.firstName,
       lastName: signupRequest.lastName,
       email: signupRequest.email,
       passwordHash: hashedPassword,
     });
 
-    var payload = new JwtPayload(newUser.id);
+    const payload = new JwtPayload(newUser.id);
     return {
       access_token: await this.jwtService.signAsync(
         JSON.parse(JSON.stringify(payload)),
@@ -39,7 +39,7 @@ export class AuthService {
   }
 
   async loginAsync(loginRequest: LoginRequest) {
-    var user = await this.usersService.findByEmailAsync(loginRequest.email);
+    const user = await this.usersService.findByEmailAsync(loginRequest.email);
     if (!user) {
       console.warn('User not found. Email or password is incorrect.');
       throw new UnauthorizedException('email or password incorrect.');
@@ -54,7 +54,7 @@ export class AuthService {
       throw new UnauthorizedException('email or password incorrect.');
     }
 
-    var payload = new JwtPayload(user.id);
+    const payload = new JwtPayload(user.id);
     return {
       access_token: await this.jwtService.signAsync(
         JSON.parse(JSON.stringify(payload)),
