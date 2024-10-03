@@ -13,9 +13,6 @@ export class Expense extends BaseEntity {
   @Column({ length: 3 })
   currency: string;
 
-  @Column()
-  passwordHash: string;
-
   @ManyToOne(() => User, (user) => user.expenses, { nullable: false })
   user: User;
 }
