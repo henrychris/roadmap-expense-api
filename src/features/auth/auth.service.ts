@@ -1,4 +1,61 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { hash, compare } from 'bcrypt';
+import { LoginRequest } from './dto/login-request-dto';
+import { UsersService } from '../users/users.service';
+import { SignupRequest } from './dto/signup-request-dto';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
-export class AuthService {}
+export class AuthService {
+  constructor(
+    private usersService: UsersService,
+    private jwtService: JwtService,
+  ) {}
+
+  async signupAsync(signupRequest: SignupRequest) {
+    var user = await this.usersService.findByEmailAsync(signupRequest.email);
+    if (user) {
+      console.warn('This email is already in use.');
+      throw new UnauthorizedException(
+        'An account exists with this email address.',
+      );
+    }
+
+    var hashedPassword = await hash(signupRequest.password, 10);
+    var newUser = await this.usersService.createAsync({
+      firstName: signupRequest.firstName,
+      lastName: signupRequest.lastName,
+      email: signupRequest.email,
+      passwordHash: hashedPassword,
+    });
+
+    return {
+      access_token: await this.jwtService.signAsync({
+        sub: newUser.id,
+      }),
+    };
+  }
+
+  async loginAsync(loginRequest: LoginRequest) {
+    var user = await this.usersService.findByEmailAsync(loginRequest.email);
+    if (!user) {
+      console.warn('User not found. Email or password is incorrect.');
+      throw new UnauthorizedException('email or password incorrect.');
+    }
+
+    const isPasswordValid = await compare(
+      loginRequest.password,
+      user.passwordHash,
+    );
+    if (!isPasswordValid) {
+      console.warn(`User found. User id: ${user.id}. Password incorrect.`);
+      throw new UnauthorizedException('email or password incorrect.');
+    }
+
+    return {
+      access_token: await this.jwtService.signAsync({
+        sub: user.id,
+      }),
+    };
+  }
+}
