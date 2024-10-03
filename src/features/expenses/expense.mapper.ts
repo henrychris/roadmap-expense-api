@@ -9,15 +9,15 @@ export function mapExpenseToGetExpenseResponse(
       id: expense.id,
       amount: expense.amount,
       currency: expense.currency,
-    },
-    category: {
-      id: expense.category.id,
-      name: expense.category.name,
-    },
-    user: {
-      id: expense.user.id,
-      firstName: expense.user.firstName,
-      lastName: expense.user.lastName,
+      category: {
+        id: expense.category.id,
+        name: expense.category.name,
+      },
+      user: {
+        id: expense.user.id,
+        firstName: expense.user.firstName,
+        lastName: expense.user.lastName,
+      },
     },
   };
 }

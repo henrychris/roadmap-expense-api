@@ -3,14 +3,14 @@ export class GetExpenseDto {
     id: string;
     amount: number;
     currency: string;
-  };
-  category: {
-    id: string;
-    name: string;
-  };
-  user: {
-    id: string;
-    firstName: string;
-    lastName: string;
+    category: {
+      id: string;
+      name: string;
+    };
+    user: {
+      id: string;
+      firstName: string;
+      lastName: string;
+    };
   };
 }
