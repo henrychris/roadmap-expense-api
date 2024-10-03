@@ -24,6 +24,7 @@ import DatabaseConfig from 'src/config/databaseConfig';
         DATABASE_NAME: Joi.string().required(),
         DATABASE_USERNAME: Joi.string().required(),
         DATABASE_PASSWORD: Joi.string().required(),
+        JWT_SECRET: Joi.string().required(),
       }),
       validationOptions: {
         noDefaults: true,
