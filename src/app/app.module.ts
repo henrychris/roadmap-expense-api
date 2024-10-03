@@ -1,19 +1,21 @@
 import { Module } from '@nestjs/common';
+import * as Joi from 'joi';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from '../features/users/users.module';
 import { ExpensesModule } from '../features/expenses/expenses.module';
+import { AuthModule } from '../features/auth/auth.module';
+import { CategoriesModule } from '../features/categories/categories.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import * as Joi from 'joi';
-import DatabaseConfig from 'src/config/databaseConfig';
-import { AuthModule } from 'src/features/auth/auth.module';
+import DatabaseConfig from '../config/databaseConfig';
 import { SeedModule } from 'src/features/seed/seed.module';
 
 @Module({
   imports: [
     UsersModule,
     ExpensesModule,
+    CategoriesModule,
     SeedModule,
     AuthModule,
     ConfigModule.forRoot({
