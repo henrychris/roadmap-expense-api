@@ -7,11 +7,13 @@ import { ExpensesModule } from '../features/expenses/expenses.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import * as Joi from 'joi';
 import DatabaseConfig from 'src/config/databaseConfig';
+import { AuthModule } from 'src/features/auth/auth.module';
 
 @Module({
   imports: [
     UsersModule,
     ExpensesModule,
+    AuthModule,
     ConfigModule.forRoot({
       isGlobal: true,
       validationSchema: Joi.object({
