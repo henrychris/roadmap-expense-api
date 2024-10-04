@@ -2,6 +2,8 @@
 
 A simple REST API for tracking expenses. Built with NestJs, TypeORM and Node. The database used is Postgres. Ensure you specify a Postgres connection in the env file.
 
+This solution is based off the Roadmap.sh [Expense API](https://roadmap.sh/projects/expense-tracker-api) project.
+
 ## Project setup
 
 ```bash
