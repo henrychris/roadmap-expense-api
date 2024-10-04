@@ -21,6 +21,7 @@ import { CurrentUser } from '../../common/decorators/currentUser';
 import { JwtPayload } from '../auth/dto/jwtPayload';
 import { ExpenseFilterDto } from './dto/expense.filter.dto';
 import { CACHE_MANAGER, Cache, CacheInterceptor } from '@nestjs/cache-manager';
+import { ThrottlerGuard } from '@nestjs/throttler';
 
 @UseGuards(AuthGuard)
 @Controller('expenses')
@@ -39,6 +40,7 @@ export class ExpensesController {
   }
 
   @UseInterceptors(CacheInterceptor)
+  @UseGuards(ThrottlerGuard)
   @Get()
   async findAll(
     @CurrentUser() jwtUser: JwtPayload,

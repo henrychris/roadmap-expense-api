@@ -11,6 +11,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import DatabaseConfig from '../config/databaseConfig';
 import { SeedModule } from 'src/features/seed/seed.module';
 import { CacheModule } from '@nestjs/cache-manager';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
   imports: [
@@ -58,6 +59,12 @@ import { CacheModule } from '@nestjs/cache-manager';
       ttl: 10000, // 10s
       isGlobal: true,
     }),
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000,
+        limit: 10,
+      },
+    ]),
   ],
   controllers: [AppController],
   providers: [AppService],
