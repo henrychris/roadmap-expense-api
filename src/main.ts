@@ -2,9 +2,16 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app/app.module';
 import * as logger from 'morgan';
 import { ConfigService } from '@nestjs/config';
-import { HttpStatus, ValidationPipe } from '@nestjs/common';
+import {
+  HttpStatus,
+  UnprocessableEntityException,
+  ValidationError,
+  ValidationPipe,
+} from '@nestjs/common';
 import { SeederService } from './features/seed/seeder.service';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { ErrorResponseFilter } from './app/filters/errorResponseFilter';
+import { SuccessResponseInterceptor } from './app/interceptors/successResponseInterceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -13,8 +20,19 @@ async function bootstrap() {
     new ValidationPipe({
       errorHttpStatusCode: HttpStatus.UNPROCESSABLE_ENTITY,
       transform: true,
+      exceptionFactory: (validationErrors: ValidationError[] = []) => {
+        return new UnprocessableEntityException(
+          validationErrors.map((error) => ({
+            field: error.property,
+            error: Object.values(error.constraints!).join(', '),
+          })),
+        );
+      },
     }),
   );
+
+  app.useGlobalFilters(new ErrorResponseFilter());
+  app.useGlobalInterceptors(new SuccessResponseInterceptor());
 
   const seederService = app.get(SeederService);
   await seederService.seedCategories();
