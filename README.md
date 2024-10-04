@@ -33,6 +33,8 @@ $ npm run dev
 $ npm run start:prod
 ```
 
+Access Swagger at <http://localhost:PORT/swagger>
+
 ## Run tests
 
 ```bash
