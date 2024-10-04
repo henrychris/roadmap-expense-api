@@ -10,6 +10,8 @@ import {
   HttpStatus,
   UseGuards,
   Query,
+  Inject,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ExpensesService } from './expenses.service';
 import { CreateExpenseDto } from './dto/create-expense.dto';
@@ -18,11 +20,15 @@ import { AuthGuard } from '../auth/guards/authGuard';
 import { CurrentUser } from '../../common/decorators/currentUser';
 import { JwtPayload } from '../auth/dto/jwtPayload';
 import { ExpenseFilterDto } from './dto/expense.filter.dto';
+import { CACHE_MANAGER, Cache, CacheInterceptor } from '@nestjs/cache-manager';
 
 @UseGuards(AuthGuard)
 @Controller('expenses')
 export class ExpensesController {
-  constructor(private readonly expensesService: ExpensesService) {}
+  constructor(
+    private readonly expensesService: ExpensesService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+  ) {}
 
   @Post()
   async createAsync(
@@ -32,12 +38,13 @@ export class ExpensesController {
     return await this.expensesService.createAsync(createExpenseDto, jwtUser);
   }
 
+  @UseInterceptors(CacheInterceptor)
   @Get()
-  findAll(
+  async findAll(
     @CurrentUser() jwtUser: JwtPayload,
     @Query() filterDto: ExpenseFilterDto,
   ) {
-    return this.expensesService.findAll(jwtUser, filterDto);
+    return await this.expensesService.findAllAsync(jwtUser, filterDto);
   }
 
   @Get(':id')

@@ -10,6 +10,7 @@ import { CategoriesModule } from '../features/categories/categories.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import DatabaseConfig from '../config/databaseConfig';
 import { SeedModule } from 'src/features/seed/seed.module';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   imports: [
@@ -52,6 +53,10 @@ import { SeedModule } from 'src/features/seed/seed.module';
         },
       }),
       inject: [ConfigService],
+    }),
+    CacheModule.register({
+      ttl: 10000, // 10s
+      isGlobal: true,
     }),
   ],
   controllers: [AppController],
