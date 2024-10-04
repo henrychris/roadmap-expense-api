@@ -58,12 +58,9 @@ export class ExpensesService {
     return mapExpenseToGetExpenseResponse(res);
   }
 
-  async findAll(jwtUser: JwtPayload, filterDto: ExpenseFilterDto) {
+  async findAllAsync(jwtUser: JwtPayload, filterDto: ExpenseFilterDto) {
     const { filter, startDate, endDate, limit = 10, page = 0 } = filterDto;
     let dateFilter = this.getDateFilter(filter, startDate, endDate);
-    console.log(`date filter: ${dateFilter}`);
-    console.log(JSON.stringify(dateFilter));
-    
 
     const [expenses, total] = await this.expenseRepository.findAndCount({
       relations: {
