@@ -4,6 +4,7 @@ import * as logger from 'morgan';
 import { ConfigService } from '@nestjs/config';
 import { HttpStatus, ValidationPipe } from '@nestjs/common';
 import { SeederService } from './features/seed/seeder.service';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -20,6 +21,15 @@ async function bootstrap() {
 
   const configService = app.get(ConfigService);
   const PORT: number = configService.getOrThrow('PORT');
+
+  const config = new DocumentBuilder()
+    .setTitle('Expense API')
+    .setDescription('A simple API to learn NestJs.')
+    .setVersion('1.0')
+    .addTag('expenses')
+    .build();
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('swagger', app, document);
 
   app
     .listen(PORT)
