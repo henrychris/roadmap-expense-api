@@ -39,6 +39,8 @@ import { ThrottlerModule } from '@nestjs/throttler';
         abortEarly: false,
       },
     }),
+    // todo: can i store db config in a single location, and use it in both dataSource.ts and here
+    // instead of duplicating configuration
     TypeOrmModule.forRootAsync({
       useFactory: (configService: ConfigService<DatabaseConfig>) => ({
         type: 'postgres',
